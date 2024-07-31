@@ -1,17 +1,22 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true,
+    "strict": false,
+    "allowJs": true,
+    "composite": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "typeRoots": ["node_modules/@types", "types"],
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "types": ["node"],
+    "isolatedModules": true,
+    "noEmit": true,
+    "forceConsistentCasingInFileNames": false,
     "paths": {
-      "@/*": [
-        "./*"
-      ]
-    }
+      "@/*": ["./packages/*"]
+    },
+    "noImplicitAny": false
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-  ]
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]
 }

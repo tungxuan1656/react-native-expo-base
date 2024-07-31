@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "rn-expo-base",
+    "name": "rnexpobase",
     "slug": "rn-expo-base",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -13,13 +13,25 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "com.tungxuan.rnexpobase",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Reason using camera",
+        "NSMicrophoneUsageDescription": "Reason using microphone"
+      },
+      "entitlements": {
+        "aps-environment": "production"
+      },
+      "googleServicesFile": "./assets/firebase/GoogleService-Info.plist"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.tungxuan.rnexpobase",
+      "permissions": ["android.permission.CAMERA", "android.permission.RECORD_AUDIO"],
+      "googleServicesFile": "./assets/firebase/google-services.json"
     },
     "web": {
       "bundler": "metro",
@@ -27,7 +39,29 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      [
+        "react-native-permissions",
+        {
+          "iosPermissions": ["Camera", "Microphone", "PhotoLibrary"]
+        }
+      ],
+      "with-rn-image-crop-picker",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ],
+      "@react-native-firebase/app",
+      "@react-native-firebase/messaging",
+      [
+        "expo-dev-launcher",
+        {
+          "launchMode": "most-recent"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
