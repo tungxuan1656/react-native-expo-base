@@ -9,5 +9,4 @@ export const AppImages = {
   img_empty_5_1: require('./images/img_empty_5_1.png'),
   img_empty_box: require('./images/img_empty_box.png'),
   img_bg_setting: require('./images/img_bg_setting.png'),
-  img_bg_signin: require('./images/img_bg_signin.png'),
 }

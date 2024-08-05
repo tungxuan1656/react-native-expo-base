@@ -1,0 +1,15 @@
+app_identifier "com.tungxuan.rnexpobase"
+apple_id "tungxuan101998@gmail.com"
+team_id "B52J6U3Y4P"
+
+# For more information about the Appfile, see:
+#     https://docs.fastlane.tools/advanced/#appfile
+
+# You can uncomment the lines below and add your own
+# team selection in case you're in multiple teams
+# team_name "Felix Krause"
+# team_id "Q2CBPJ58CA"
+
+# To select a team for App Store Connect use
+# itc_team_name "Company Name"
+# itc_team_id "18742801"

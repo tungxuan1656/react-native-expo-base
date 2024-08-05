@@ -46,7 +46,7 @@ const Home = (props: any) => {
       />
       <TextField label="hello" />
       <NumberField label="money" />
-      <Tag text="123" icon={AppIcons.ico_add} onPress={() => {}} />
+      <Tag text={`${process.env.EXPO_PUBLIC_API_URL}`} icon={AppIcons.ico_add} onPress={() => {}} />
       <Button
         title="call api"
         onPress={async () => {

@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "642525696555",
+    "project_id": "rn-expo-base",
+    "storage_bucket": "rn-expo-base.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:642525696555:android:682bda605145b4d85f506e",
+        "android_client_info": {
+          "package_name": "com.tungxuan.rnexpobase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrdic-9UkTIQfIYbzMrIjD8MISVS1XUIw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:642525696555:android:d974e63a4b968da25f506e",
+        "android_client_info": {
+          "package_name": "com.tungxuan.rnexpobase.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrdic-9UkTIQfIYbzMrIjD8MISVS1XUIw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

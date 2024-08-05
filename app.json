@@ -4,7 +4,7 @@
     "slug": "rn-expo-base",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/app_daily_icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
@@ -22,7 +22,8 @@
       "entitlements": {
         "aps-environment": "production"
       },
-      "googleServicesFile": "./assets/firebase/GoogleService-Info.plist"
+      "googleServicesFile": "./assets/firebase/production/GoogleService-Info.plist",
+      "buildNumber": "0"
     },
     "android": {
       "adaptiveIcon": {
@@ -31,7 +32,8 @@
       },
       "package": "com.tungxuan.rnexpobase",
       "permissions": ["android.permission.CAMERA", "android.permission.RECORD_AUDIO"],
-      "googleServicesFile": "./assets/firebase/google-services.json"
+      "googleServicesFile": "./assets/firebase/production/google-services.json",
+      "versionCode": 1
     },
     "web": {
       "bundler": "metro",

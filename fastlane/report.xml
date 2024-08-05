@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="fastlane.lanes">
+    
+    
+    
+      
+      <testcase classname="fastlane.lanes" name="00: read_json" time="0.000467">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="01: git_branch" time="0.012953">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="02: last_git_commit" time="0.031111">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="03: Switch to android config_production lane" time="0.000123">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="04: Switch to android config lane" time="8.4e-05">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="05: Switch to android update_app_name_android lane" time="6.1e-05">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="06: sed -i &apos;&apos; &apos;/&lt;string name=&quot;app_name&quot;&gt;/c\
+    &lt;string name=&quot;app_name&quot;&gt;Base&lt;/string&gt;
+    &apos; ../android/app/src/main/res/values/strings.xml" time="0.00728">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="07: Switch to android update_default_config_android lane" time="8.1e-05">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="08: sed -i &apos;&apos; &apos;/applicationId/c\
+        applicationId &quot;com.tungxuan.rnexpobase&quot;
+    &apos; ../android/app/build.gradle" time="0.010123">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="09: sed -i &apos;&apos; &apos;/versionCode/c\
+        versionCode 1
+    &apos; ../android/app/build.gradle" time="0.010398">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="10: sed -i &apos;&apos; &apos;/versionName/c\
+        versionName &quot;1.0.0&quot;
+    &apos; ../android/app/build.gradle" time="0.010209">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="11: Switch to android update_gg_services_android lane" time="0.000113">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="12: Switch to android build lane" time="0.000103">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="13: clean" time="9.044025">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="14: assemblerelease" time="147.262471">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="15: Switch to android upload lane" time="0.00104">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="16: appcenter_upload" time="3.505241">
+        
+      </testcase>
+    
+  </testsuite>
+</testsuites>

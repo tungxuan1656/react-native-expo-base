@@ -1,0 +1,310 @@
+# app-store, validation, ad-hoc, package, enterprise, development, developer-id and mac-application
+
+fastlane_require 'dotenv'
+app_json=read_json(json_path: "app.json")
+
+ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "180"
+ENV["FASTLANE_XCODE_LIST_TIMEOUT"] = "180"
+ENV['BUILD_RELEASE_TYPE'] = "release"
+
+# ------ Environment path ------ #
+ENV_DEV_NAME='.env'
+ENV_PRODUCTION_NAME='.env.production'
+
+ENV_DEV='../.env'
+ENV_PRODUCTION='../.env.production'
+
+# ------ IOS configs path ------ #
+IOS_FOLDER=app_json[:expo][:name]
+
+XCODEPROJ_DIR="./ios/#{IOS_FOLDER}.xcodeproj"
+WORKSPACE_DIR="./ios/#{IOS_FOLDER}.xcworkspace"
+OUTPUT_DIR='./ios/build'
+PATH_BUILD_ARCHIVE='./ios/archive/'
+INFO_PLIST_PATH="#{IOS_FOLDER}/Info.plist"
+IOS_TARGETS="#{IOS_FOLDER}"
+
+API_TOKEN='61de5aa2d922f0b6a47ba0b92a045ebfcb2435d7'
+
+
+desc 'Update GoogleService-Info.plist'
+lane :update_gg_services_ios do |options|
+  google_service_path = "../assets/firebase/#{ENV['ENV_NAME'].downcase}/GoogleService-Info.plist"
+  if(File.exist?(google_service_path))
+    src = File.expand_path(google_service_path)
+    # Thay đúng file
+    dest = File.expand_path("../ios/#{IOS_FOLDER}/GoogleService-Info.plist")
+    FileUtils.cp_r(src, dest)
+  end
+end
+
+desc 'Update google-services.json'
+lane :update_gg_services_android do
+  google_service_path = "../assets/firebase/#{ENV['ENV_NAME'].downcase}/google-services.json"
+  if(File.exist?(google_service_path))
+    src = File.expand_path(google_service_path)
+    dest = File.expand_path("../android/app/google-services.json")
+    FileUtils.cp_r(src, dest)
+  end
+end
+
+lane :update_app_name_android do
+  sh("sed -i '' '/<string name=\"app_name\">/c\\
+    <string name=\"app_name\">#{ENV['APP_NAME']}</string>
+    ' ../android/app/src/main/res/values/strings.xml")
+end
+
+lane :update_default_config_android do
+  sh("sed -i '' '/applicationId/c\\
+        applicationId \"#{ENV['APP_ID_ANDROID']}\"
+    ' ../android/app/build.gradle")
+
+  sh("sed -i '' '/versionCode/c\\
+        versionCode #{app_json[:expo][:android][:versionCode]}
+    ' ../android/app/build.gradle")
+
+  sh("sed -i '' '/versionName/c\\
+        versionName \"#{app_json[:expo][:version]}\"
+    ' ../android/app/build.gradle")
+end
+
+
+# ------ Config for Android ------ #
+platform :android do
+  before_all do |lane|
+    _branch = git_branch
+    ENV["CI_COMMIT_BRANCH"] = _branch
+    _commit = last_git_commit
+    ENV["CI_COMMIT_MESSAGE"] = _commit[:message]
+    puts("BRANCH: #{ENV["CI_COMMIT_BRANCH"]}, COMMIT: #{ENV["CI_COMMIT_MESSAGE"]}")
+  end
+
+  lane :update_icon do |options|
+    android_appicon(
+      appicon_image_file: "#{app_json[:expo][:icon]}",
+      appicon_icon_types: [:launcher],
+      appicon_path: 'android/app/src/main/res/mipmap',
+      generate_rounded: true,
+    )
+  end
+
+  desc 'Build APK application.'
+  lane :build do
+    gradle(
+      task: 'clean',
+      project_dir: 'android/'
+    )
+    build_task = "assemble"
+    gradle(
+      task: build_task,
+      build_type: 'release',
+      project_dir: 'android/'
+    )
+  end
+
+  desc 'Build store application.'
+  lane :build_store do
+    gradle(
+      task: 'clean',
+      project_dir: 'android/'
+    )
+    build_task = "bundle"
+    gradle(
+      task: build_task,
+      build_type: 'release',
+      project_dir: 'android/'
+    )
+  end
+
+  desc 'Upload Appcenter'
+  lane :upload do |options|
+    appcenter_upload(
+      api_token: API_TOKEN,
+      owner_name: ENV['APPCENTER_OWNER_NAME'],
+      app_name: ENV['CODEPUSH_APP_NAME_ANDROID'],
+      apk: options[:'path'] ? options[:'path']: "./android/app/build/outputs/apk/release/app-release.apk",
+      destinations: ENV['APPCENTER_DESTINATIONS'],
+      destination_type: 'group',
+      release_notes: "branch: #{ENV['CI_COMMIT_BRANCH']} \n NOTED: #{ENV['CI_COMMIT_MESSAGE']}"
+    )
+  end
+
+  desc 'Config'
+  lane :config do |options|
+    update_app_name_android
+    update_default_config_android
+    update_gg_services_android
+    # update_icon(icon_path: PRODUCTION_ICON_PATH)
+  end
+
+  desc 'Config android with env'
+  lane :config_development do |options|
+    Dotenv.overload ENV_DEV
+    ENV['ENVFILE']="#{ENV_DEV_NAME}"
+    config
+  end
+
+  desc 'Config android with env'
+  lane :config_production do |options|
+    Dotenv.overload ENV_PRODUCTION
+    ENV['ENVFILE']="#{ENV_PRODUCTION_NAME}"
+    config
+  end
+
+  desc 'Build Iternal app and upload to App Center'
+  lane :development do |options| 
+    config_development
+    build
+    # upload
+  end
+
+  desc 'Build Production.'
+  lane :production do |options|
+    config_production
+    build
+    upload
+  end
+
+  desc 'Build Store.'
+  lane :store do |options|
+    config_production
+    build_store
+    upload(path: "android/app/build/outputs/bundle/release/app-release.aab")
+  end
+end
+
+# ------ Config for IOS ------ #
+platform :ios do
+
+  before_all do |lane|
+    _branch = git_branch
+    ENV["CI_COMMIT_BRANCH"] = _branch
+    _commit = last_git_commit
+    ENV["CI_COMMIT_MESSAGE"] = _commit[:message]
+    puts("BRANCH: #{ENV["CI_COMMIT_BRANCH"]}, COMMIT: #{ENV["CI_COMMIT_MESSAGE"]}")
+  end
+
+  lane :update_icon do |options|
+    appicon(
+      appicon_image_file: "#{app_json[:expo][:icon]}",
+      appicon_devices: [:ipad, :iphone, :ios_marketing],
+      appicon_path: "ios/#{IOS_FOLDER}/Images.xcassets",
+      remove_alpha: true
+    )
+  end
+
+  desc 'Update config'
+  lane :update_info do |options|
+    update_code_signing_settings(
+      path: XCODEPROJ_DIR,
+      use_automatic_signing: true,
+      targets: IOS_TARGETS,
+      team_id: "#{CredentialsManager::AppfileConfig.try_fetch_value(:team_id)}",
+      bundle_identifier: "#{ENV["APP_ID_IOS"]}"
+    )
+
+    update_app_identifier(
+      xcodeproj: XCODEPROJ_DIR,
+      plist_path: INFO_PLIST_PATH,
+      app_identifier: "#{ENV["APP_ID_IOS"]}"
+    )
+
+    update_info_plist(
+      xcodeproj: XCODEPROJ_DIR,
+      plist_path: INFO_PLIST_PATH,
+      display_name: "#{ENV['APP_NAME']}",
+      app_identifier: "#{ENV["APP_ID_IOS"]}"
+    )
+
+    update_info_plist(
+      xcodeproj: XCODEPROJ_DIR,
+      plist_path: INFO_PLIST_PATH,
+      block: proc do |plist|
+        plist["CFBundleShortVersionString"] = "#{app_json[:expo][:version]}"
+        plist["CFBundleVersion"] = "#{app_json[:expo][:ios][:buildNumber]}"
+      end
+    )
+  end
+
+  desc 'Build IPA application'
+  lane :build do |options|
+    gym(
+      scheme: ENV['SCHEME'],
+      workspace: WORKSPACE_DIR,
+      configuration: options[:'configuration'], #'Release' StagingEnterprise
+      buildlog_path: OUTPUT_DIR,
+      output_directory: OUTPUT_DIR,
+      archive_path: PATH_BUILD_ARCHIVE,
+      output_name: "release.ipa",
+      xcargs: "-allowProvisioningUpdates",
+      export_method: options[:'export_method'],
+      include_bitcode: true,
+      silent: true,
+      clean: true,
+      verbose: true
+    )
+  end
+
+  desc 'Upload to App Center.'
+  lane :upload do
+    appcenter_upload(
+      api_token: API_TOKEN,
+      owner_name: ENV['APPCENTER_OWNER_NAME'],
+      app_name: ENV['APPCENTER_APP_NAME_IOS'],
+      ipa: "./ios/build/release.ipa",
+      destinations: ENV['APPCENTER_DESTINATIONS'],
+      destination_type: 'group',
+      release_notes: "branch: #{ENV['CI_COMMIT_BRANCH']} \n NOTED: #{ENV['CI_COMMIT_MESSAGE']}",
+      upload_build_only: true
+    )
+  end
+
+  desc 'Config'
+  lane :config do |options|
+    update_info
+    # update_icon
+    update_gg_services_ios
+  end
+
+  desc 'Config android with env'
+  lane :config_development do |options|
+    Dotenv.overload ENV_DEV
+    ENV['ENVFILE']="#{ENV_DEV_NAME}"
+    config
+  end
+
+  desc 'Config android with env'
+  lane :config_production do |options|
+    Dotenv.overload ENV_PRODUCTION
+    ENV['ENVFILE']="#{ENV_PRODUCTION_NAME}"
+    config
+  end
+
+  desc 'Build testing and upload to App Center.'
+  lane :development do |options|
+    config_development
+    build(export_method: "development", configuration: "Release")
+    # upload
+  end
+
+  desc 'Build Production.'
+  lane :production do |options|
+    config_production
+    build(export_method: "development", configuration: "Release")
+    # upload
+  end
+
+end
+
+desc 'Switch env'
+platform :switch do |options|
+  lane :development do |options|
+    Fastlane::LaneManager.cruise_lane("ios", "config_development", options)
+    Fastlane::LaneManager.cruise_lane("android", "config_development", options)
+  end
+
+  lane :production do |options|
+    Fastlane::LaneManager.cruise_lane("ios", "config_production", options)
+    Fastlane::LaneManager.cruise_lane("android", "config_production", options)
+  end
+end
